@@ -1,6 +1,7 @@
 const axios = require('axios');
 
 exports.handler = async (event, context) => {
+    // Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
@@ -8,13 +9,23 @@ exports.handler = async (event, context) => {
         };
     }
 
-    try {
-        const { apiKey, prompt } = JSON.parse(event.body);
+    // Get API key from environment variable
+    const apiKey = process.env.GEMINI_API_KEY;
 
-        if (!apiKey || !prompt) {
+    if (!apiKey) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'API Key is not configured' })
+        };
+    }
+
+    try {
+        const { prompt } = JSON.parse(event.body);
+
+        if (!prompt) {
             return {
                 statusCode: 400,
-                body: JSON.stringify({ error: 'API Key and Prompt are required' })
+                body: JSON.stringify({ error: 'Prompt is required' })
             };
         }
 
