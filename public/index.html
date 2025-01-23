@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini AI Node.js App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="container mx-auto p-6 bg-gray-100">
+    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
+        <h1 class="text-2xl font-bold mb-4 text-center text-blue-600">Gemini AI Asisten</h1>
+
+        <div class="mb-4">
+            <label for="prompt" class="block text-sm font-medium text-gray-700">Masukkan Pertanyaan</label>
+            <textarea id="prompt" rows="4"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200"
+                placeholder="Contoh: Jelaskan tentang kecerdasan buatan..."></textarea>
+        </div>
+
+        <button id="generate-btn"
+            class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300">
+            Dapatkan Jawaban
+        </button>
+
+        <div id="loading" class="mt-4 text-center text-blue-500 hidden">
+            Memproses permintaan...
+        </div>
+
+        <div id="response" class="mt-4 p-4 bg-gray-100 rounded-md">
+            Jawaban akan ditampilkan di sini
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('generate-btn').addEventListener('click', async () => {
+            const prompt = document.getElementById('prompt').value;
+            const loadingEl = document.getElementById('loading');
+            const responseEl = document.getElementById('response');
+
+            if (!prompt) {
+                alert('Harap masukkan pertanyaan');
+                return;
+            }
+
+            loadingEl.classList.remove('hidden');
+            responseEl.textContent = 'Memuat...';
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                loadingEl.classList.add('hidden');
+                responseEl.textContent = data.text;
+            } catch (error) {
+                loadingEl.classList.add('hidden');
+                responseEl.textContent = `Terjadi kesalahan: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+
+</html>
