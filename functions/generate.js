@@ -1,8 +1,6 @@
-// functions/generate.js
 const axios = require('axios');
 
 exports.handler = async (event, context) => {
-    // Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
